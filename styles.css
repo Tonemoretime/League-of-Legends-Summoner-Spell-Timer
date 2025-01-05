@@ -715,3 +715,35 @@ html, body {
         transform: translateY(0);
     }
 }
+
+/* 游戏时间预设按钮样式 */
+.game-time-presets {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    justify-content: center;
+    width: 100%;
+}
+
+.game-time-preset-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(76, 175, 80, 0.9);  /* 使用半透明的绿色 */
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.game-time-preset-btn:hover {
+    background: rgba(69, 160, 73, 0.9);  /* 稍深的绿色 */
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.game-time-preset-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

@@ -86,6 +86,11 @@ class Timer {
             this.settings.timeFormat = e.target.value;
             localStorage.setItem('timeFormat', e.target.value);
         });
+
+        // 添加固定时间点按钮的事件监听
+        document.querySelectorAll('.game-time-preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleTimePreset(e));
+        });
     }
 
     handleAddButton(event) {
@@ -796,6 +801,56 @@ class Timer {
             const rowIndex = row.dataset.row;
             this.tpManager.updateTPCooldown(rowIndex);
         });
+    }
+
+    // 添加新方法处理固定时间点
+    handleTimePreset(event) {
+        const button = event.target;
+        const preset = button.dataset.preset;
+        let targetSeconds = 0;
+
+        switch(preset) {
+            case 'welcome':
+                targetSeconds = 26;  // 欢迎来到英雄联盟 - 00:26
+                break;
+            case 'minions':
+                targetSeconds = 36;  // 敌军30秒到达战场 - 00:36
+                break;
+            case 'battle':
+                targetSeconds = 65;  // 全军出击 - 01:05
+                break;
+            default:
+                return;
+        }
+
+        // 如果正在编辑时间，先退出编辑模式
+        if (this.isEditing) {
+            this.isEditing = false;
+            document.querySelector('.confirm-time-btn').classList.add('hidden');
+        }
+
+        // 清除现有的计时器
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+
+        // 设置新的游戏时间
+        const minutes = Math.floor(targetSeconds / 60);
+        const seconds = targetSeconds % 60;
+        
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+        // 重置游戏时间并开始计时
+        this.gameStartTime = Date.now();
+        this.gameTimeOffset = targetSeconds * 1000;
+        
+        // 更新所有计时器的结束时间
+        this.updateAllFinishTimes();
+        
+        // 重新开始计时器
+        this.startGameTimer();
     }
 }
 
