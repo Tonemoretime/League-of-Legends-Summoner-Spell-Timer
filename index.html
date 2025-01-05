@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOL召唤师技能计时器</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+    <script src="data.js"></script>
+    <script src="voice.js"></script>
+</head>
+<body>
+    <textarea id="copy-area" style="position: absolute; left: -9999px;"></textarea>
+    <div class="container">
+        <div class="game-time-display">
+            <div class="time-container">
+                <span class="game-time-title">游戏时间</span>
+                <div class="time-display">
+                    <div class="time-adjust-btns">
+                        <button class="time-btn" data-type="minutes" data-value="-10">-10</button>
+                        <button class="time-btn" data-type="minutes" data-value="-5">-5</button>
+                        <button class="time-btn" data-type="minutes" data-value="-1">-1</button>
+                        <button class="time-btn" data-type="minutes" data-value="+1">+1</button>
+                        <button class="time-btn" data-type="minutes" data-value="+5">+5</button>
+                        <button class="time-btn" data-type="minutes" data-value="+10">+10</button>
+                    </div>
+                    <div class="time-unit">
+                        <span id="minutes">00</span>
+                    </div>
+                    <span>:</span>
+                    <div class="time-unit">
+                        <span id="seconds">00</span>
+                    </div>
+                    <div class="time-adjust-btns">
+                        <button class="time-btn" data-type="seconds" data-value="-10">-10</button>
+                        <button class="time-btn" data-type="seconds" data-value="-5">-5</button>
+                        <button class="time-btn" data-type="seconds" data-value="-1">-1</button>
+                        <button class="time-btn" data-type="seconds" data-value="+1">+1</button>
+                        <button class="time-btn" data-type="seconds" data-value="+5">+5</button>
+                        <button class="time-btn" data-type="seconds" data-value="+10">+10</button>
+                    </div>
+                </div>
+                <button class="confirm-time-btn hidden">确定</button>
+            </div>
+        </div>
+        <div class="timer-grid">
+            <!-- 表头 -->
+            <div class="grid-header">
+                <div class="lane-header">
+                    位置
+                    <select id="position-format" class="format-select">
+                        <option value="full">完整</option>
+                        <option value="simple">简略</option>
+                        <option value="mini">极简</option>
+                    </select>
+                </div>
+                <div class="spell-header-group">
+                    <div class="spell-names">
+                        <span>D</span>
+                        <span>F</span>
+                    </div>
+                    <select id="spell-format" class="format-select">
+                        <option value="full">完整</option>
+                        <option value="simple">简略</option>
+                        <option value="mini">极简</option>
+                    </select>
+                </div>
+                <div class="modifier-header">天赋</div>
+                <div class="modifier-header">装备</div>
+                <div class="trigger-header">
+                    点击开始计时
+                    <select id="time-format" class="format-select">
+                        <option value="remaining">剩余时间</option>
+                        <option value="finish">结束时间</option>
+                        <option value="finish-rounded">结束时间(四舍五入)</option>
+                    </select>
+                </div>
+                <div class="copy-btn-header">
+                    <div class="copy-controls">
+                        <button id="copy-timers" class="copy-btn">复制信息</button>
+                        <div class="auto-copy-controls">
+                            <input type="checkbox" id="auto-copy-toggle" class="auto-copy-checkbox">
+                            <label for="auto-copy-toggle">自动复制</label>
+                            <select id="auto-copy-interval" class="auto-copy-select" disabled>
+                                <option value="2">2秒</option>
+                                <option value="5">5秒</option>
+                                <option value="10">10秒</option>
+                            </select>
+                            <select id="copy-format" class="copy-format-select">
+                                <option value="normal">普通模式</option>
+                                <option value="single-line">单行模式</option>
+                                <option value="compact">整合模式</option>
+                                <option value="only_flash">单闪模式</option>
+                            </select>
+                            <input type="checkbox" id="voice-toggle" class="voice-checkbox">
+                            <label for="voice-toggle">播放提示音</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 第一个英雄位置 -->
+            <div class="champion-row" data-row="0">
+                <div class="lane-display">
+                    <span data-full-name="上路">上路</span>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="modifiers">
+                    <button class="modifier-btn rune" data-active="false">
+                        <img src="data/images/cosmic-insight.png" alt="星界洞悉">
+                    </button>
+                    <button class="modifier-btn item" data-active="false">
+                        <img src="data/images/lucidity-boots.png" alt="明朗之靴">
+                    </button>
+                </div>
+                <div class="trigger-container">
+                    <button class="trigger-btn spell1" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                    <button class="trigger-btn spell2" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                </div>
+                <div class="timer-group">
+                    <div class="timer-info">
+                        <div class="start-time1"></div>
+                        <div class="timer1"></div>
+                        <div class="finish-time1"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                    <div class="timer-info">
+                        <div class="start-time2"></div>
+                        <div class="timer2"></div>
+                        <div class="finish-time2"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 第二个英雄位置 -->
+            <div class="champion-row" data-row="1">
+                <div class="lane-display">
+                    <span data-full-name="打野">打野</span>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="modifiers">
+                    <button class="modifier-btn rune" data-active="false">
+                        <img src="data/images/cosmic-insight.png" alt="星界洞悉">
+                    </button>
+                    <button class="modifier-btn item" data-active="false">
+                        <img src="data/images/lucidity-boots.png" alt="明朗之靴">
+                    </button>
+                </div>
+                <div class="trigger-container">
+                    <button class="trigger-btn spell1" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                    <button class="trigger-btn spell2" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                </div>
+                <div class="timer-group">
+                    <div class="timer-info">
+                        <div class="start-time1"></div>
+                        <div class="timer1"></div>
+                        <div class="finish-time1"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                    <div class="timer-info">
+                        <div class="start-time2"></div>
+                        <div class="timer2"></div>
+                        <div class="finish-time2"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 第三个英雄位置 -->
+            <div class="champion-row" data-row="2">
+                <div class="lane-display">
+                    <span data-full-name="中路">中路</span>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="modifiers">
+                    <button class="modifier-btn rune" data-active="false">
+                        <img src="data/images/cosmic-insight.png" alt="星界洞悉">
+                    </button>
+                    <button class="modifier-btn item" data-active="false">
+                        <img src="data/images/lucidity-boots.png" alt="明朗之靴">
+                    </button>
+                </div>
+                <div class="trigger-container">
+                    <button class="trigger-btn spell1" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                    <button class="trigger-btn spell2" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                </div>
+                <div class="timer-group">
+                    <div class="timer-info">
+                        <div class="start-time1"></div>
+                        <div class="timer1"></div>
+                        <div class="finish-time1"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                    <div class="timer-info">
+                        <div class="start-time2"></div>
+                        <div class="timer2"></div>
+                        <div class="finish-time2"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 第四个英雄位置 -->
+            <div class="champion-row" data-row="3">
+                <div class="lane-display">
+                    <span data-full-name="射手">射手</span>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="modifiers">
+                    <button class="modifier-btn rune" data-active="false">
+                        <img src="data/images/cosmic-insight.png" alt="星界洞悉">
+                    </button>
+                    <button class="modifier-btn item" data-active="false">
+                        <img src="data/images/lucidity-boots.png" alt="明朗之靴">
+                    </button>
+                </div>
+                <div class="trigger-container">
+                    <button class="trigger-btn spell1" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                    <button class="trigger-btn spell2" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                </div>
+                <div class="timer-group">
+                    <div class="timer-info">
+                        <div class="start-time1"></div>
+                        <div class="timer1"></div>
+                        <div class="finish-time1"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                    <div class="timer-info">
+                        <div class="start-time2"></div>
+                        <div class="timer2"></div>
+                        <div class="finish-time2"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 第五个英雄位置 -->
+            <div class="champion-row" data-row="4">
+                <div class="lane-display">
+                    <span data-full-name="辅助">辅助</span>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="spell-select">
+                    <button class="add-btn">+</button>
+                    <img class="spell-icon hidden" src="" alt="">
+                    <button class="clear-btn hidden">×</button>
+                </div>
+                <div class="modifiers">
+                    <button class="modifier-btn rune" data-active="false">
+                        <img src="data/images/cosmic-insight.png" alt="星界洞悉">
+                    </button>
+                    <button class="modifier-btn item" data-active="false">
+                        <img src="data/images/lucidity-boots.png" alt="明朗之靴">
+                    </button>
+                </div>
+                <div class="trigger-container">
+                    <button class="trigger-btn spell1" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                    <button class="trigger-btn spell2" disabled>
+                        <img class="trigger-icon" src="data/images/daojishi.png" alt="计时">
+                    </button>
+                </div>
+                <div class="timer-group">
+                    <div class="timer-info">
+                        <div class="start-time1"></div>
+                        <div class="timer1"></div>
+                        <div class="finish-time1"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                    <div class="timer-info">
+                        <div class="start-time2"></div>
+                        <div class="timer2"></div>
+                        <div class="finish-time2"></div>
+                    </div>
+                    <div class="timer-adjust-btns">
+                        <button class="adjust-btn" data-value="-1">-1</button>
+                        <button class="adjust-btn" data-value="-5">-5</button>
+                        <button class="adjust-btn" data-value="-10">-10</button>
+                        <button class="adjust-btn" data-value="-30">-30</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal hidden">
+            <div class="modal-content">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索...">
+                </div>
+                <div class="selection-grid"></div>
+            </div>
+        </div>
+    </div>
+    <script src="data.js"></script>
+    <script src="auto_copy.js"></script>
+    <script src="TP.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
