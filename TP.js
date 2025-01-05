@@ -1,8 +1,8 @@
 class TPManager {
     constructor() {
         this.levelCooldowns = {
-            1: 240, 2: 240, 3: 240, 4: 240, 5: 240, 6: 240,
-            7: 240, 8: 240, 9: 240, 10: 240, 11: 240, 12: 240,
+            1: 330, 2: 320, 3: 310, 4: 300, 5: 290, 6: 280,
+            7: 270, 8: 260, 9: 250, 10: 240, 11: 240, 12: 240,
             13: 240, 14: 240, 15: 240, 16: 240, 17: 240, 18: 240
         };
         
@@ -19,8 +19,8 @@ class TPManager {
         localStorage.setItem('championLevels', JSON.stringify(this.championLevels));
 
         // 冷却时间常量
-        this.BEFORE_14_MIN_COOLDOWN = 360;  // 14分钟前
-        this.AFTER_14_MIN_COOLDOWN = 240;   // 14分钟后（解封的传送）
+        this.BEFORE_10_MIN_COOLDOWN = 360;  // 10分钟前
+        this.AFTER_10_MIN_COOLDOWN = 240;   // 10分钟后（解封的传送）
 
         this.init();
     }
@@ -162,11 +162,11 @@ class TPManager {
     getTPCooldown(rowIndex) {
         const gameMinutes = parseInt(document.getElementById('minutes').textContent);
         
-        if (gameMinutes < 14) {
-            // 14分钟前固定360秒
-            return this.BEFORE_14_MIN_COOLDOWN;
+        if (gameMinutes < 10) {
+            // 10分钟前固定360秒
+            return this.BEFORE_10_MIN_COOLDOWN;
         } else {
-            // 14分钟后根据等级返回对应冷却时间
+            // 10分钟后根据等级返回对应冷却时间
             const level = this.championLevels[rowIndex];
             return this.levelCooldowns[level];
         }
@@ -184,13 +184,13 @@ class TPManager {
                 const cooldown = this.getTPCooldown(rowIndex);
                 triggerBtn.dataset.cooldown = cooldown;
                 
-                // 更新技能名称和提示
-                if (gameMinutes >= 14) {
+                // 更新判断时间为10分钟
+                if (gameMinutes >= 10) {
                     img.alt = '解封的传送';
-                    triggerBtn.title = `解封的传送 (${cooldown}秒)`;  // 添加冷却时间提示
+                    triggerBtn.title = `解封的传送 (${cooldown}秒)`;
                 } else {
                     img.alt = '传送';
-                    triggerBtn.title = `传送 (${cooldown}秒)`;  // 添加冷却时间提示
+                    triggerBtn.title = `传送 (${cooldown}秒)`;
                 }
             }
         });
@@ -199,7 +199,7 @@ class TPManager {
     startTimeCheck() {
         setInterval(() => {
             const minutes = parseInt(document.getElementById('minutes').textContent);
-            if (minutes >= 14) {
+            if (minutes >= 10) {
                 this.updateAllTPNames();
             }
         }, 1000);
